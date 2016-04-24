@@ -6,13 +6,13 @@ Simple bash script for a game of Name That Song. It plays initially 3seconds of 
 ### Menu Functions
 
 Menu
-1. Play Again (play same snippet)
-2. Play More (play a longer part of the song)
-3. Play Other Part (play same length but from another part of the song)
-4. Show Song Info (displays the answer (Artist - Title))
-5. Next (next song)
-6. Create New Playlist
-7. Exit
+  1. Play Again (play same snippet)
+  2. Play More (play a longer part of the song)
+  3. Play Other Part (play same length but from another part of the song)
+  4. Show Song Info (displays the answer (Artist - Title))
+  5. Next (next song)
+  6. Create New Playlist
+  7. Exit
 
 ### Dependencies
 * mplayer
