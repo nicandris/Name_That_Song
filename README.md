@@ -1,6 +1,8 @@
 # Name That Song
 Simple bash script for a game of Name That Song. It plays initially 3seconds of the song and you have to guess it. The 3 seconds are selected randomly from the script. 
 
+![name_that_song](https://cloud.githubusercontent.com/assets/284798/14771120/9938c0a4-0a81-11e6-9ef4-47afc48de8c9.png)
+
 ### Menu Functions
 
 Menu
