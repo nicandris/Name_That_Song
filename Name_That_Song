@@ -1,0 +1,82 @@
+#!/bin/bash
+#A small game of Name That Song
+
+#Debugging [+x to disable, -x to enable]
+set +x
+
+#Playlist
+filename=~/.playlist.m3u #Hardcoded Playlist filename
+DIR=$(dirname "${filename}")/ #Playlist path
+
+end=(3 5 8 10 15 30) #Seconds of song to play
+endi=0 #Value selector for end array
+
+# A POSIX variable
+OPTIND=1        # Reset in case getopts has been used previously in the shell.
+PROGNAME=$0	# Declare progname
+
+#Get launch arguments
+while getopts "pc:" opt; do
+	case "$opt" in
+		p) filename="$2" #-p for defining the playlist
+		;;
+		c) pathtomp3s="$2" #-c to create the playlist
+		if [ ! -f ~/.playlist.m3u ]; then
+			touch ~/.playlist.m3u
+		fi
+		find "$pathtomp3s" -type f -iname \*.mp3 > ~/.playlist.m3u
+		exec "$PROGNAME" -p ~/.playlist.m3u
+		;;
+		esac
+done
+
+
+
+#Create/Display menu
+function menu { 
+	echo "";echo "Started at: $start seconds. Played ${end[endi]} seconds."
+	
+	select opt in "Play Again" "Play More" "Play Other Part" "Show Song Info" "Next" "Create New Playlist" "Exit"; do
+		if [ "$opt" = "Play Again" ]; then #Play the song again
+			mplayer -ss "$start" -endpos ${end[endi]} "$song" > /dev/null 2>&1;menu; 
+	        elif [ "$opt" = "Play More" ]; then #Play next amount of seconds of song
+			let endi++;mplayer -ss "$start" -endpos ${end[endi]} "$song" > /dev/null 2>&1;menu;
+		elif [ "$opt" = "Play Other Part" ]; then #Play another part of the song
+			random_start;mplayer -ss "$start" -endpos ${end[endi]} "$song" > /dev/null 2>&1;menu;
+		elif [ "$opt" = "Show Song Info" ]; then #Display song info from mp3info
+			echo "";echo `mp3info -p "%a - %t" "$song"`;menu;
+		elif [ "$opt" = "Next" ]; then #Restart script/Play next song
+			exec "$PROGNAME";
+		elif [ "$opt" = "Create New Playlist" ]; then #Create New playlist
+			create_new;
+		elif [ "$opt" = "Exit" ]; then #Exit
+			exit;
+		fi
+	done
+}
+
+#Create a random startpoint for the song
+function random_start {
+	length="$(mp3info -p "%S" "$song")"   #Total length of song in seconds 
+	start=$(( $RANDOM % ($length -5) )) #Random Song startpoint
+
+}
+
+#Create a new playlist
+function create_new {
+	read -ep $'The song/playlist does not exist. Please Specify a folder where the mp3s are stored:\n' -i "${PWD}" warpToLocation
+	exec "$PROGNAME" -c "$warpToLocation";
+}
+
+#Main function
+function main {
+	song=`shuf -n 1  "$filename"` > /dev/null #get a random song from the list
+	if [ ! -f "$song" ]; then
+		create_new
+	fi
+	random_start #randomize start time
+	mplayer -ss "$start" -endpos ${end[endi]} "$song" > /dev/null 2>&1 # Play song
+	menu #Display the menu
+}
+
+main #Start Game
